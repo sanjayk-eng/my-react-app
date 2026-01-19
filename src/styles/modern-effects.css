@@ -1,0 +1,67 @@
+/* Clean Modern UI Styles */
+
+/* Clean Header */
+.app-header {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Clean Sidebar */
+.app-sidebar {
+  background: #ffffff;
+  border-right: 1px solid var(--border-color);
+}
+
+/* Clean Cards */
+.form-card,
+.summary-card,
+.clinic-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+}
+
+/* Clean Buttons */
+.btn-primary {
+  background: var(--primary-color);
+  border: none;
+  color: #ffffff;
+}
+
+/* Clean Form Inputs */
+.form-input,
+.form-textarea,
+.form-select {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  background: #ffffff;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Clean Status Indicators */
+.status-active {
+  background: var(--success-color);
+  color: #ffffff;
+}
+
+/* Clean Loading Animation */
+.btn-loading::after {
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}

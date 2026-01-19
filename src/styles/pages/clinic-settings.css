@@ -1,0 +1,62 @@
+/* Clinic Settings Page */
+.clinic-settings-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--spacing-xl);
+}
+
+.clinic-settings-page .page-header {
+  margin-bottom: var(--spacing-xl);
+}
+
+.clinic-settings-page .page-header h1 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.clinic-settings-page .page-header .text-secondary {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  margin-bottom: 0;
+}
+
+/* Multiple form cards spacing */
+.clinic-settings-page .form-card + .form-card {
+  margin-top: var(--spacing-xl);
+}
+
+/* Form actions alignment */
+.clinic-settings-page .form-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.clinic-settings-page .form-actions-left {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.clinic-settings-page .form-actions-right {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+  .clinic-settings-page {
+    padding: var(--spacing-lg);
+  }
+  
+  .clinic-settings-page .form-card-footer {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .clinic-settings-page .form-actions-left,
+  .clinic-settings-page .form-actions-right {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -1,0 +1,143 @@
+/* Clean UI Styles */
+
+/* Enhanced Sidebar */
+.app-sidebar {
+  background: #ffffff;
+  border-right: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.sidebar-header {
+  background: var(--primary-color);
+  color: var(--text-white);
+  border-bottom: none;
+}
+
+.sidebar-title {
+  color: var(--text-white);
+  font-weight: var(--font-weight-bold);
+}
+
+.sidebar-subtitle {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Enhanced Navigation */
+.sidebar-nav-link {
+  border-radius: var(--border-radius-lg);
+  margin-bottom: var(--spacing-1);
+}
+
+.sidebar-nav-link.active {
+  background: var(--primary-color);
+  color: var(--text-white);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Enhanced Header */
+.app-header {
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.app-logo {
+  color: var(--primary-color);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Enhanced User Menu */
+.user-avatar {
+  background: var(--primary-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.user-menu-dropdown {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Enhanced Cards */
+.form-card,
+.summary-card,
+.clinic-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Enhanced Buttons */
+.btn {
+  border-radius: var(--border-radius);
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  border: none;
+  color: var(--text-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* Enhanced Form Elements */
+.form-input,
+.form-textarea,
+.form-select {
+  border: 1px solid var(--border-color);
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+/* Enhanced Dashboard */
+.dashboard-grid {
+  gap: var(--spacing-6);
+}
+
+/* Enhanced Status Badges */
+.status-badge {
+  border-radius: var(--border-radius);
+}
+
+.status-active {
+  background: var(--success-color);
+  color: var(--text-white);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Enhanced Empty States */
+.empty-state {
+  background: var(--bg-primary);
+  border: 2px dashed var(--border-color);
+}
+
+/* Enhanced Focus States for Accessibility */
+.btn:focus-visible,
+.form-input:focus-visible,
+.form-textarea:focus-visible,
+.form-select:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Enhanced Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: var(--border-radius-full);
+}

@@ -1,0 +1,64 @@
+/* Auth Pages (Login & Signup) */
+.auth-page-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-secondary);
+  padding: var(--spacing-md);
+  width: 100%;
+}
+
+.auth-form-card {
+  width: 100%;
+  max-width: 28rem; /* 448px - good for login forms */
+  background-color: var(--bg-primary);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  margin: 0 auto;
+}
+
+.auth-form-card-wide {
+  max-width: 32rem; /* 512px - wider for signup forms */
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .auth-page-container {
+    padding: var(--spacing-sm);
+    align-items: flex-start;
+    padding-top: var(--spacing-lg);
+  }
+  
+  .auth-form-card {
+    padding: var(--spacing-lg);
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  .auth-form-card-wide {
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .auth-form-card {
+    max-width: 90%;
+  }
+  
+  .auth-form-card-wide {
+    max-width: 90%;
+  }
+}
+
+@media (min-width: 769px) {
+  .auth-form-card {
+    max-width: 28rem;
+  }
+  
+  .auth-form-card-wide {
+    max-width: 32rem;
+  }
+}

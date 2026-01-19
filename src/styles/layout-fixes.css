@@ -1,0 +1,496 @@
+/* Layout Fixes - Override conflicting styles and ensure proper centering */
+
+/* Reset body and html conflicts */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  min-height: 100vh;
+}
+
+/* Reset and fix main layout */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-secondary);
+  position: relative;
+  width: 100%;
+}
+
+/* Fix sidebar positioning */
+.app-sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--bg-primary);
+  border-right: 1px solid var(--border-color);
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: var(--z-fixed);
+  transition: transform var(--transition-normal);
+}
+
+/* Desktop sidebar behavior - Only show on desktop */
+@media (min-width: 1025px) {
+  .app-sidebar {
+    transform: translateX(0) !important;
+    position: fixed;
+    z-index: 100;
+  }
+  
+  .app-main:not(.sidebar-collapsed) {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+  }
+  
+  .app-main.sidebar-collapsed {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* Mobile sidebar behavior - Hidden by default */
+@media (max-width: 1024px) {
+  .app-sidebar {
+    transform: translateX(-100%);
+    position: fixed;
+    z-index: 100;
+  }
+  
+  .app-sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .app-main {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+}
+
+/* Fix main content area */
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: margin-left var(--transition-normal);
+}
+
+/* Desktop main content positioning */
+@media (min-width: 1025px) {
+  .app-main:not(.sidebar-collapsed) {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+  }
+  
+  .app-main.sidebar-collapsed {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* Mobile main content positioning */
+@media (max-width: 1024px) {
+  .app-main {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* Fix header positioning */
+.app-header {
+  height: var(--header-height);
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--spacing-6);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Fix content area centering */
+.app-content {
+  flex: 1;
+  padding: var(--spacing-6);
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fix page containers */
+.dashboard,
+.profile-page,
+.clinics-page,
+.add-clinic-page,
+.clinic-settings-page,
+.clinic-users-page,
+.add-clinic-user-page,
+.income-management-page,
+.expense-management-page,
+.expense-head-page,
+.bas-report-page {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Fix page headers */
+.page-header {
+  width: 100%;
+  margin-bottom: var(--spacing-6);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+  flex-wrap: wrap;
+}
+
+.page-header-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.page-header-actions {
+  flex-shrink: 0;
+}
+
+/* Fix form cards */
+.form-card {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-6);
+  box-shadow: var(--shadow-sm);
+  box-sizing: border-box;
+}
+
+/* Fix dashboard grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-6);
+  width: 100%;
+  margin-bottom: var(--spacing-8);
+}
+
+/* Fix clinics grid */
+.clinics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: var(--spacing-6);
+  width: 100%;
+}
+
+/* Fix summary cards */
+.summary-card,
+.clinic-card {
+  width: 100%;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-6);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+  box-sizing: border-box;
+}
+
+/* Fix form rows */
+.form-row {
+  display: flex;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-6);
+  width: 100%;
+}
+
+.form-col {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Fix form groups */
+.form-group {
+  margin-bottom: var(--spacing-6);
+  width: 100%;
+}
+
+/* Fix form inputs */
+.form-input,
+.form-textarea,
+.form-select {
+  width: 100%;
+  padding: var(--spacing-3) var(--spacing-4);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  box-sizing: border-box;
+}
+
+/* Fix buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* Fix form card footer */
+.form-card-footer {
+  margin-top: var(--spacing-6);
+  padding-top: var(--spacing-6);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-4);
+  width: 100%;
+}
+
+/* Fix empty states */
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-8);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  max-width: 500px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Fix activity list */
+.activity-list {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Fix quick actions */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-6);
+  width: 100%;
+}
+
+/* Fix profile photo section */
+.profile-photo-section {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-6);
+  width: 100%;
+}
+
+.profile-photo-preview {
+  width: 120px;
+  height: 120px;
+  border-radius: var(--border-radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profile-photo-controls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+/* Responsive fixes */
+@media (max-width: 1024px) {
+  .app-sidebar:not(.open) {
+    transform: translateX(-100%);
+  }
+  
+  .app-sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .app-main {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  .sidebar-toggle {
+    display: block;
+  }
+  
+  .user-info {
+    display: none;
+  }
+}
+
+@media (min-width: 1025px) {
+  .app-sidebar {
+    transform: translateX(0) !important;
+  }
+  
+  .sidebar-toggle {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-content {
+    padding: var(--spacing-4);
+  }
+  
+  .app-header {
+    padding: 0 var(--spacing-4);
+  }
+  
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-4);
+  }
+  
+  .page-header-actions {
+    align-self: flex-start;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .form-col {
+    margin-bottom: var(--spacing-6);
+  }
+  
+  .form-col:last-child {
+    margin-bottom: 0;
+  }
+  
+  .form-card {
+    padding: var(--spacing-4);
+  }
+  
+  .form-card-footer {
+    flex-direction: column;
+    gap: var(--spacing-3);
+  }
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-4);
+  }
+  
+  .clinics-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-4);
+  }
+  
+  .quick-actions {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-4);
+  }
+  
+  .profile-photo-section {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .profile-photo-controls {
+    align-items: center;
+  }
+}
+
+/* Override any conflicting positioning */
+.app-content > * {
+  position: relative;
+}
+
+/* Ensure proper box-sizing for all elements */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Fix any overflow issues */
+.app-main,
+.app-content {
+  overflow-x: hidden;
+}
+
+/* Ensure proper width constraints */
+.container,
+.page-container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Fix z-index stacking - Lower values to prevent overlay issues */
+.app-sidebar {
+  z-index: 100;
+}
+
+.app-header {
+  z-index: 110;
+}
+
+.sidebar-overlay {
+  z-index: 90;
+}
+
+.user-menu-dropdown {
+  z-index: 120;
+}
+
+.toast-container {
+  z-index: 130;
+}
+
+.loading-screen {
+  z-index: 140;
+}
