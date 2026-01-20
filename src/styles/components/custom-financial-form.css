@@ -1,0 +1,496 @@
+/* Custom Financial Form Styles */
+.custom-financial-form {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.form-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e1e5e9;
+}
+
+.form-section-title {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.method-status {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.method-status.active {
+  background: #48bb78;
+  color: white;
+}
+
+.config-summary {
+  background: #f7fafc;
+  padding: 1rem;
+  border-radius: 6px;
+  border-left: 4px solid #4299e1;
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.config-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.config-label {
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.config-value {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.method-indicator {
+  color: #4299e1;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.radio-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.radio-label:hover {
+  border-color: #4299e1;
+  background: #f7fafc;
+}
+
+.radio-label input[type="radio"] {
+  margin: 0;
+  margin-top: 0.125rem;
+}
+
+.radio-text {
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 0;
+}
+
+.checkbox-text {
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.form-help {
+  font-size: 0.875rem;
+  color: #718096;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.conditional-field {
+  margin-left: 1.5rem;
+  padding-left: 1rem;
+  border-left: 2px solid #e2e8f0;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 2rem;
+}
+
+/* Income Entry Form Styles */
+.income-entry-form {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.config-display {
+  background: #edf2f7;
+  border-left: 4px solid #38b2ac;
+}
+
+.calculations-display {
+  background: #f0fff4;
+  border-left: 4px solid #48bb78;
+}
+
+.calculations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.calculation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.calculation-label {
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.calculation-value {
+  font-weight: 600;
+  color: #2d3748;
+  font-family: 'Courier New', monospace;
+}
+
+.bas-mapping-display {
+  background: #fffaf0;
+  border-left: 4px solid #ed8936;
+}
+
+.bas-mapping-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.bas-mapping-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.bas-mapping-label {
+  font-weight: 500;
+  color: #4a5568;
+  font-size: 0.875rem;
+}
+
+.bas-mapping-value {
+  font-weight: 600;
+  color: #2d3748;
+  font-family: 'Courier New', monospace;
+}
+
+/* Page Layout Styles */
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.page-title-section h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.page-subtitle {
+  color: #718096;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.page-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.alert-info {
+  background: #ebf8ff;
+  border: 1px solid #bee3f8;
+  color: #2b6cb0;
+}
+
+.alert-warning {
+  background: #fffbeb;
+  border: 1px solid #fed7aa;
+  color: #c05621;
+}
+
+.current-config-summary {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.form-container {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 2rem;
+}
+
+.tab-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-weight: 500;
+  color: #718096;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.tab-button:hover {
+  color: #4299e1;
+}
+
+.tab-button.active {
+  color: #4299e1;
+  border-bottom-color: #4299e1;
+}
+
+.tab-content {
+  min-height: 400px;
+}
+
+.form-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.form-card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-card-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #718096;
+}
+
+.data-table {
+  overflow-x: auto;
+}
+
+.data-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.data-table th {
+  background: #f7fafc;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.amount-remitted {
+  font-weight: 600;
+  color: #38a169;
+}
+
+.bas-summary {
+  font-size: 0.875rem;
+}
+
+.bas-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.bas-key {
+  color: #718096;
+}
+
+.bas-value {
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.summary-stats {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #f7fafc;
+  border-radius: 6px;
+}
+
+.summary-stats h3 {
+  margin: 0 0 1rem 0;
+  color: #2d3748;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-label {
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.stat-value {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+/* Financial Config Actions */
+.financial-config-actions {
+  padding: 1.5rem;
+}
+
+.config-info {
+  margin-bottom: 2rem;
+}
+
+.config-info p {
+  color: #4a5568;
+  margin-bottom: 1rem;
+}
+
+.config-features h4 {
+  margin: 1rem 0 0.5rem 0;
+  color: #2d3748;
+}
+
+.config-features ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #4a5568;
+}
+
+.config-features li {
+  margin-bottom: 0.25rem;
+}
+
+.config-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .page-container {
+    padding: 1rem;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .config-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .calculations-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .bas-mapping-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .config-buttons {
+    flex-direction: column;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+}

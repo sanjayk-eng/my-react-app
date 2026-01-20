@@ -4,7 +4,7 @@ import { getClinics, setClinics } from '../../utils/localStorage.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { initializeSampleData } from '../../utils/sampleData.js';
 import ClinicInfoForm from '../../components/forms/ClinicInfoForm.jsx';
-import FinancialSettingsForm from '../../components/forms/FinancialSettingsForm.jsx';
+import Button from '../../components/common/Button.jsx';
 import LoadingScreen from '../../components/common/LoadingScreen.jsx';
 import '../../styles/pages/clinic-settings.css';
 
@@ -43,28 +43,6 @@ const ClinicSettingsPage = () => {
     } catch (error) {
       console.error('Error saving clinic info:', error);
       showError('Failed to save clinic information. Please try again.');
-      throw error;
-    }
-  };
-
-  const handleSaveFinancialSettings = async (financialSettings) => {
-    try {
-      const clinics = getClinics();
-      const updatedClinics = clinics.map(c => 
-        c.id === id 
-          ? { ...c, financialSettings, updatedAt: new Date().toISOString() }
-          : c
-      );
-      
-      setClinics(updatedClinics);
-      
-      // Update local clinic state
-      setClinic(prev => ({ ...prev, financialSettings }));
-      
-      showSuccess('Financial settings saved successfully!');
-    } catch (error) {
-      console.error('Error saving financial settings:', error);
-      showError('Failed to save financial settings. Please try again.');
       throw error;
     }
   };
@@ -115,20 +93,50 @@ const ClinicSettingsPage = () => {
         />
       </div>
 
-      {/* Financial Settings Section */}
+      {/* Custom Financial Settings Section */}
       <div className="form-card">
         <div className="form-card-header">
-          <h2 className="form-card-title">Financial Configuration</h2>
+          <h2 className="form-card-title">Custom Financial Configuration</h2>
           <p className="form-card-description">
-            Set up commission splitting, lab fees, and calculation methods for this clinic
+            Configure custom financial calculation methods and income entry forms for this clinic
           </p>
         </div>
         
-        <FinancialSettingsForm
-          clinic={clinic}
-          onSave={handleSaveFinancialSettings}
-          onCancel={handleCancel}
-        />
+        <div className="financial-config-actions">
+          <div className="config-info">
+            <p>
+              Set up custom financial forms to define how income calculations are performed. 
+              This replaces the old financial settings system with a more flexible approach.
+            </p>
+            
+            <div className="config-features">
+              <h4>Features:</h4>
+              <ul>
+                <li>Net Method (with/without super holding)</li>
+                <li>Gross Method (with various options)</li>
+                <li>Dynamic input fields based on configuration</li>
+                <li>Automatic BAS mapping</li>
+                <li>Real-time calculations</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="config-buttons">
+            <Button
+              variant="primary"
+              onClick={() => navigate(`/clinics/${id}/custom-financial-settings`)}
+            >
+              Configure Custom Financial Form
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={() => navigate(`/clinics/${id}/income`)}
+            >
+              Go to Income Management
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

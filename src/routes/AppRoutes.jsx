@@ -20,6 +20,8 @@ import ClinicSettingsPage from '../pages/clinics/ClinicSettingsPage.jsx';
 import ClinicUsersPage from '../pages/clinics/ClinicUsersPage.jsx';
 import AddClinicUserPage from '../pages/clinics/AddClinicUserPage.jsx';
 import EditClinicUserPage from '../pages/clinics/EditClinicUserPage.jsx';
+import CustomFinancialSettingsPage from '../pages/clinics/CustomFinancialSettingsPage.jsx';
+import CustomFormsPage from '../pages/clinics/CustomFormsPage.jsx';
 import IncomeManagementPage from '../pages/clinics/IncomeManagementPage.jsx';
 import ExpenseManagementPage from '../pages/clinics/ExpenseManagementPage.jsx';
 import ExpenseHeadPage from '../pages/clinics/ExpenseHeadPage.jsx';
@@ -116,6 +118,22 @@ const AppRoutes = () => {
         <PrivateRoute>
           <Layout>
             <EditClinicUserPage />
+          </Layout>
+        </PrivateRoute>
+      } />
+      
+      <Route path="/clinics/:id/custom-financial-settings" element={
+        <PrivateRoute>
+          <Layout>
+            <CustomFinancialSettingsPage />
+          </Layout>
+        </PrivateRoute>
+      } />
+      
+      <Route path="/clinics/:id/custom-forms" element={
+        <PrivateRoute>
+          <Layout>
+            <CustomFormsPage />
           </Layout>
         </PrivateRoute>
       } />

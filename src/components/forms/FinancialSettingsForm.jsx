@@ -462,7 +462,7 @@ const FinancialSettingsForm = ({ clinic, onSave, onCancel }) => {
                     type="number"
                     min="0"
                     max="100"
-                    step="0.01"
+                    step="0.00"
                     value={formData.grossMethod.gstOnServiceFacilityFeePercent}
                     onChange={(e) => handleInputChange('grossMethod', 'gstOnServiceFacilityFeePercent', parseFloat(e.target.value) || 10)}
                     error={errors['grossMethod.gstOnServiceFacilityFeePercent']}
