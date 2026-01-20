@@ -333,7 +333,7 @@ const ExpenseManagementPage = () => {
                   label="Amount *"
                   type="number"
                   min="0"
-                  
+                  step="0.01"
                   value={inputs.amount}
                   onChange={(e) => handleInputChange('amount', e.target.value)}
                   placeholder="0.00"

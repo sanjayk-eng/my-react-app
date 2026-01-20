@@ -403,7 +403,7 @@ const IncomeEntryForm = ({ clinic, customFinancialConfig, onSave, onCancel }) =>
               label="Gross Patient Fee (A) *"
               type="number"
               min="0"
-              
+              step="0.01"
               value={formData.grossPatientFee}
               onChange={(e) => handleInputChange('grossPatientFee', e.target.value)}
               error={errors.grossPatientFee}
@@ -420,7 +420,7 @@ const IncomeEntryForm = ({ clinic, customFinancialConfig, onSave, onCancel }) =>
                 label="Lab Fee (B)"
                 type="number"
                 min="0"
-                
+                step="0.01"
                 value={formData.labFee}
                 onChange={(e) => handleInputChange('labFee', e.target.value)}
                 error={errors.labFee}
@@ -439,7 +439,7 @@ const IncomeEntryForm = ({ clinic, customFinancialConfig, onSave, onCancel }) =>
                 label="GST on Lab Fee"
                 type="number"
                 min="0"
-                
+                step="0.01"
                 value={formData.gstOnLabFee}
                 onChange={(e) => handleInputChange('gstOnLabFee', e.target.value)}
                 placeholder="Enter GST on lab fee"
@@ -457,7 +457,7 @@ const IncomeEntryForm = ({ clinic, customFinancialConfig, onSave, onCancel }) =>
                   label="Merchant Fee (Inc GST)"
                   type="number"
                   min="0"
-                  
+                  step="0.01"
                   value={formData.merchantFeeIncGst}
                   onChange={(e) => handleInputChange('merchantFeeIncGst', e.target.value)}
                   placeholder="Enter merchant fee including GST"
@@ -470,7 +470,7 @@ const IncomeEntryForm = ({ clinic, customFinancialConfig, onSave, onCancel }) =>
                   label="Bank Fee"
                   type="number"
                   min="0"
-                  
+                  step="0.01"
                   value={formData.bankFee}
                   onChange={(e) => handleInputChange('bankFee', e.target.value)}
                   placeholder="Enter bank fee"
@@ -487,7 +487,7 @@ const IncomeEntryForm = ({ clinic, customFinancialConfig, onSave, onCancel }) =>
               <Input
                 label="GST on Patient Fee"
                 type="number"
-                
+                step="0.01"
                 value={formData.gstOnPatientFee}
                 onChange={(e) => handleInputChange('gstOnPatientFee', e.target.value)}
                 placeholder="Enter GST on patient fee (can be negative)"
@@ -504,7 +504,7 @@ const IncomeEntryForm = ({ clinic, customFinancialConfig, onSave, onCancel }) =>
                 label="Merchant Fee"
                 type="number"
                 min="0"
-                
+                step="0.01"
                 value={formData.merchantFee}
                 onChange={(e) => handleInputChange('merchantFee', e.target.value)}
                 placeholder="Enter merchant fee"
@@ -520,7 +520,7 @@ const IncomeEntryForm = ({ clinic, customFinancialConfig, onSave, onCancel }) =>
                 label="GST on Merchant Fee"
                 type="number"
                 min="0"
-                
+                step="0.01"
                 value={formData.gstOnMerchantFee}
                 onChange={(e) => handleInputChange('gstOnMerchantFee', e.target.value)}
                 placeholder="Enter GST on merchant fee"
