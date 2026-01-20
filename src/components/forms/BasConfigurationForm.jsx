@@ -342,7 +342,7 @@ const BasConfigurationForm = ({ clinic, onSave, onCancel }) => {
               type="number"
               min="0"
               max="100"
-              step="0.00"
+              
               value={formData.gstSettings.defaultGstRate}
               onChange={(e) => handleSettingsChange('gstSettings', 'defaultGstRate', parseFloat(e.target.value) || 10)}
               error={errors['gstSettings.defaultGstRate']}
@@ -370,7 +370,7 @@ const BasConfigurationForm = ({ clinic, onSave, onCancel }) => {
               label="GST-Free Threshold ($)"
               type="number"
               min="0"
-              step="0.00"
+              
               value={formData.gstSettings.gstFreeThreshold}
               onChange={(e) => handleSettingsChange('gstSettings', 'gstFreeThreshold', parseFloat(e.target.value) || 0)}
               placeholder="0.00"

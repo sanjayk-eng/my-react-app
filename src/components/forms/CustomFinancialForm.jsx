@@ -258,7 +258,7 @@ const CustomFinancialForm = ({ clinic, onSave, onCancel }) => {
                 type="number"
                 min="0"
                 max="100"
-                step="0.00"
+                
                 value={formData.netMethod.commissionSplitting}
                 onChange={(e) => handleInputChange('netMethod', 'commissionSplitting', parseFloat(e.target.value) || 40)}
                 error={errors['netMethod.commissionSplitting']}
@@ -276,7 +276,7 @@ const CustomFinancialForm = ({ clinic, onSave, onCancel }) => {
                 type="number"
                 min="0"
                 max="100"
-                step="0.00"
+                
                 value={formData.netMethod.gstOnCommission}
                 onChange={(e) => handleInputChange('netMethod', 'gstOnCommission', parseFloat(e.target.value) || 10)}
                 error={errors['netMethod.gstOnCommission']}
@@ -349,7 +349,7 @@ const CustomFinancialForm = ({ clinic, onSave, onCancel }) => {
                 type="number"
                 min="0"
                 max="100"
-                step="0.00"
+                
                 value={formData.grossMethod.serviceFacilityFeePercent}
                 onChange={(e) => handleInputChange('grossMethod', 'serviceFacilityFeePercent', parseFloat(e.target.value) || 60)}
                 error={errors['grossMethod.serviceFacilityFeePercent']}
@@ -367,7 +367,7 @@ const CustomFinancialForm = ({ clinic, onSave, onCancel }) => {
                 type="number"
                 min="0"
                 max="100"
-                step="0.00"
+                
                 value={formData.grossMethod.gstOnServiceFacilityFee}
                 onChange={(e) => handleInputChange('grossMethod', 'gstOnServiceFacilityFee', parseFloat(e.target.value) || 10)}
                 error={errors['grossMethod.gstOnServiceFacilityFee']}
@@ -451,7 +451,7 @@ const CustomFinancialForm = ({ clinic, onSave, onCancel }) => {
                     type="number"
                     min="0"
                     max="100"
-                    step="0.00"
+                    
                     value={formData.grossMethod.gstOnMerchantFee}
                     onChange={(e) => handleInputChange('grossMethod', 'gstOnMerchantFee', parseFloat(e.target.value) || 10)}
                     placeholder="10"
@@ -500,7 +500,7 @@ const CustomFinancialForm = ({ clinic, onSave, onCancel }) => {
                       type="number"
                       min="0"
                       max="100"
-                      step="0.00"
+                      
                       value={formData.grossMethod.outworkChargeRate}
                       onChange={(e) => handleInputChange('grossMethod', 'outworkChargeRate', parseFloat(e.target.value) || 40)}
                       error={errors['grossMethod.outworkChargeRate']}

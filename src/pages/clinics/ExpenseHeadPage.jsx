@@ -470,7 +470,7 @@ const ExpenseHeadPage = () => {
                       label="Purchase Price *"
                       type="number"
                       min="0"
-                      step="0.00"
+                      
                       value={entityFormData.purchasePrice}
                       onChange={(e) => handleEntityFormChange('purchasePrice', parseFloat(e.target.value) || 0)}
                       error={errors.purchasePrice}
@@ -484,7 +484,7 @@ const ExpenseHeadPage = () => {
                       label="Charge Per Use *"
                       type="number"
                       min="0"
-                      step="0.00"
+                      
                       value={entityFormData.chargePerUse}
                       onChange={(e) => handleEntityFormChange('chargePerUse', parseFloat(e.target.value) || 0)}
                       error={errors.chargePerUse}

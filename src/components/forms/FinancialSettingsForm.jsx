@@ -227,7 +227,7 @@ const FinancialSettingsForm = ({ clinic, onSave, onCancel }) => {
               type="number"
               min="0"
               max="100"
-              step="0.00"
+              
               value={formData.commissionSplitting.commissionPercent}
               onChange={(e) => handleInputChange('commissionSplitting', 'commissionPercent', parseFloat(e.target.value) || 0)}
               error={errors['commissionSplitting.commissionPercent']}
@@ -262,7 +262,7 @@ const FinancialSettingsForm = ({ clinic, onSave, onCancel }) => {
                 type="number"
                 min="0"
                 max="100"
-                step="0.00"
+                
                 value={formData.commissionSplitting.gstPercent}
                 onChange={(e) => handleInputChange('commissionSplitting', 'gstPercent', parseFloat(e.target.value) || 10)}
                 error={errors['commissionSplitting.gstPercent']}
@@ -337,7 +337,7 @@ const FinancialSettingsForm = ({ clinic, onSave, onCancel }) => {
                   type="number"
                   min="0"
                   max="100"
-                  step="0.00"
+                  
                   value={formData.netMethod.superComponentPercent}
                   onChange={(e) => handleInputChange('netMethod', 'superComponentPercent', parseFloat(e.target.value) || 12)}
                   error={errors['netMethod.superComponentPercent']}
@@ -462,7 +462,7 @@ const FinancialSettingsForm = ({ clinic, onSave, onCancel }) => {
                     type="number"
                     min="0"
                     max="100"
-                    step="0.00"
+                    
                     value={formData.grossMethod.gstOnServiceFacilityFeePercent}
                     onChange={(e) => handleInputChange('grossMethod', 'gstOnServiceFacilityFeePercent', parseFloat(e.target.value) || 10)}
                     error={errors['grossMethod.gstOnServiceFacilityFeePercent']}
@@ -482,7 +482,7 @@ const FinancialSettingsForm = ({ clinic, onSave, onCancel }) => {
                   type="number"
                   min="0"
                   max="100"
-                  step="0.00"
+                  
                   value={formData.grossMethod.gstLabFeePercent}
                   onChange={(e) => handleInputChange('grossMethod', 'gstLabFeePercent', parseFloat(e.target.value) || 10)}
                   error={errors['grossMethod.gstLabFeePercent']}
@@ -499,7 +499,7 @@ const FinancialSettingsForm = ({ clinic, onSave, onCancel }) => {
                   label="Merchant Fee + Bank Fee with GST *"
                   type="number"
                   min="0"
-                  step="0.00"
+                  
                   value={formData.grossMethod.merchantBankFeeWithGst}
                   onChange={(e) => handleInputChange('grossMethod', 'merchantBankFeeWithGst', parseFloat(e.target.value) || 0)}
                   error={errors['grossMethod.merchantBankFeeWithGst']}
@@ -517,7 +517,7 @@ const FinancialSettingsForm = ({ clinic, onSave, onCancel }) => {
                   type="number"
                   min="0"
                   max="100"
-                  step="0.00"
+                  
                   value={formData.grossMethod.gstPatientFeePercent}
                   onChange={(e) => handleInputChange('grossMethod', 'gstPatientFeePercent', parseFloat(e.target.value) || 10)}
                   error={errors['grossMethod.gstPatientFeePercent']}
@@ -535,7 +535,7 @@ const FinancialSettingsForm = ({ clinic, onSave, onCancel }) => {
                   type="number"
                   min="0"
                   max="100"
-                  step="0.00"
+                  
                   value={formData.grossMethod.labFeeChargePercent}
                   onChange={(e) => handleInputChange('grossMethod', 'labFeeChargePercent', parseFloat(e.target.value) || 0)}
                   error={errors['grossMethod.labFeeChargePercent']}
