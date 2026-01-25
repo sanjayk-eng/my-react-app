@@ -20,7 +20,10 @@ const ExpenseHeadPage = () => {
     description: '',
     gstApplicable: false,
     gstPercentage: 10,
-    gstType: 'inclusive' // 'inclusive' or 'exclusive'
+    gstType: 'inclusive', // 'inclusive' or 'exclusive'
+    labFeeApplicable: false,
+    labFeePaidBy: 'clinic', // 'clinic' or 'dentist'
+    gstOnLabFee: false
   });
 
   const [errors, setErrors] = useState({});
@@ -37,10 +40,27 @@ const ExpenseHeadPage = () => {
   }, [id]);
 
   const handleHeadFormChange = (field, value) => {
-    setHeadFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setHeadFormData(prev => {
+      const newData = {
+        ...prev,
+        [field]: value
+      };
+      
+      // If lab fee is enabled, disable GST
+      if (field === 'labFeeApplicable' && value === true) {
+        newData.gstApplicable = false;
+        newData.gstType = 'inclusive';
+      }
+      
+      // If GST is enabled, disable lab fee
+      if (field === 'gstApplicable' && value === true) {
+        newData.labFeeApplicable = false;
+        newData.labFeePaidBy = 'clinic';
+        newData.gstOnLabFee = false;
+      }
+      
+      return newData;
+    });
     
     if (errors[field]) {
       setErrors(prev => ({
@@ -59,10 +79,6 @@ const ExpenseHeadPage = () => {
     
     if (!headFormData.description.trim()) {
       newErrors.description = 'Description is required';
-    }
-
-    if (headFormData.gstApplicable && (!headFormData.gstPercentage || headFormData.gstPercentage <= 0)) {
-      newErrors.gstPercentage = 'GST percentage must be greater than 0';
     }
     
     setErrors(newErrors);
@@ -102,7 +118,10 @@ const ExpenseHeadPage = () => {
       description: '', 
       gstApplicable: false, 
       gstPercentage: 10, 
-      gstType: 'inclusive' 
+      gstType: 'inclusive',
+      labFeeApplicable: false,
+      labFeePaidBy: 'clinic',
+      gstOnLabFee: false
     });
     setShowHeadForm(false);
     setEditingHead(null);
@@ -116,7 +135,10 @@ const ExpenseHeadPage = () => {
       description: head.description,
       gstApplicable: head.gstApplicable || false,
       gstPercentage: head.gstPercentage || 10,
-      gstType: head.gstType || 'inclusive'
+      gstType: head.gstType || 'inclusive',
+      labFeeApplicable: head.labFeeApplicable || false,
+      labFeePaidBy: head.labFeePaidBy || 'clinic',
+      gstOnLabFee: head.gstOnLabFee || false
     });
     setShowHeadForm(true);
   };
@@ -138,7 +160,10 @@ const ExpenseHeadPage = () => {
       description: '', 
       gstApplicable: false, 
       gstPercentage: 10, 
-      gstType: 'inclusive' 
+      gstType: 'inclusive',
+      labFeeApplicable: false,
+      labFeePaidBy: 'clinic',
+      gstOnLabFee: false
     });
     setErrors({});
   };
@@ -207,47 +232,77 @@ const ExpenseHeadPage = () => {
                 <label className="checkbox-label">
                   <input
                     type="checkbox"
-                    checked={headFormData.gstApplicable}
-                    onChange={(e) => handleHeadFormChange('gstApplicable', e.target.checked)}
+                    checked={headFormData.labFeeApplicable}
+                    onChange={(e) => handleHeadFormChange('labFeeApplicable', e.target.checked)}
                   />
-                  GST Applicable
+                  Lab Fee Applicable
                 </label>
               </div>
             </div>
 
-            {headFormData.gstApplicable && (
+            {headFormData.labFeeApplicable && (
               <>
                 <div className="form-row">
                   <div className="form-group">
-                    <Input
-                      label="GST Percentage *"
-                      type="number"
-                      min="0"
-                      max="100"
-                      step="0.1"
-                      value={headFormData.gstPercentage}
-                      onChange={(e) => handleHeadFormChange('gstPercentage', parseFloat(e.target.value) || 0)}
-                      error={errors.gstPercentage}
-                      placeholder="10"
-                      help="Default is 10% (Australian GST rate)"
+                    <Select
+                      label="Lab Fee Paid By *"
+                      value={headFormData.labFeePaidBy}
+                      onChange={(e) => handleHeadFormChange('labFeePaidBy', e.target.value)}
+                      options={[
+                        { value: 'clinic', label: 'Paid by Clinic' },
+                        { value: 'dentist', label: 'Paid by Dentist' }
+                      ]}
+                      help="Choose who pays the lab fee"
                     />
                   </div>
                 </div>
 
                 <div className="form-row">
                   <div className="form-group">
-                    <Select
-                      label="GST Type *"
-                      value={headFormData.gstType}
-                      onChange={(e) => handleHeadFormChange('gstType', e.target.value)}
-                      options={[
-                        { value: 'inclusive', label: 'Inclusive GST (Price includes GST)' },
-                        { value: 'exclusive', label: 'Exclusive GST (GST added to price)' }
-                      ]}
-                      help="Choose how GST is calculated for this expense head"
-                    />
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={headFormData.gstOnLabFee}
+                        onChange={(e) => handleHeadFormChange('gstOnLabFee', e.target.checked)}
+                      />
+                      GST on Lab Fee
+                    </label>
                   </div>
                 </div>
+              </>
+            )}
+
+            {!headFormData.labFeeApplicable && (
+              <>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={headFormData.gstApplicable}
+                        onChange={(e) => handleHeadFormChange('gstApplicable', e.target.checked)}
+                      />
+                      GST Applicable
+                    </label>
+                  </div>
+                </div>
+
+                {headFormData.gstApplicable && (
+                  <div className="form-row">
+                    <div className="form-group">
+                      <Select
+                        label="GST Type *"
+                        value={headFormData.gstType}
+                        onChange={(e) => handleHeadFormChange('gstType', e.target.value)}
+                        options={[
+                          { value: 'inclusive', label: 'Inclusive GST (Price includes GST)' },
+                          { value: 'exclusive', label: 'Exclusive GST (GST added to price)' }
+                        ]}
+                        help="Choose how GST is calculated for this expense head. GST rate is fixed at 10%."
+                      />
+                    </div>
+                  </div>
+                )}
               </>
             )}
 
@@ -273,8 +328,10 @@ const ExpenseHeadPage = () => {
                   <th>Name</th>
                   <th>Description</th>
                   <th>GST Applicable</th>
-                  <th>GST Rate</th>
                   <th>GST Type</th>
+                  <th>Lab Fee</th>
+                  <th>Lab Fee Paid By</th>
+                  <th>GST on Lab Fee</th>
                   <th>Created</th>
                   <th>Actions</th>
                 </tr>
@@ -290,12 +347,28 @@ const ExpenseHeadPage = () => {
                       </span>
                     </td>
                     <td>
-                      {head.gstApplicable ? `${head.gstPercentage || 10}%` : '-'}
-                    </td>
-                    <td>
                       {head.gstApplicable ? (
                         <span className={`gst-type ${head.gstType || 'inclusive'}`}>
-                          {head.gstType === 'exclusive' ? 'Exclusive' : 'Inclusive'}
+                          {head.gstType === 'exclusive' ? 'Exclusive 10%' : 'Inclusive 10%'}
+                        </span>
+                      ) : '-'}
+                    </td>
+                    <td>
+                      <span className={`status-badge ${head.labFeeApplicable ? 'success' : 'secondary'}`}>
+                        {head.labFeeApplicable ? 'Yes' : 'No'}
+                      </span>
+                    </td>
+                    <td>
+                      {head.labFeeApplicable ? (
+                        <span className={`lab-fee-paid-by ${head.labFeePaidBy || 'clinic'}`}>
+                          {head.labFeePaidBy === 'dentist' ? 'Dentist' : 'Clinic'}
+                        </span>
+                      ) : '-'}
+                    </td>
+                    <td>
+                      {head.labFeeApplicable ? (
+                        <span className={`status-badge ${head.gstOnLabFee ? 'success' : 'secondary'}`}>
+                          {head.gstOnLabFee ? 'Yes' : 'No'}
                         </span>
                       ) : '-'}
                     </td>
