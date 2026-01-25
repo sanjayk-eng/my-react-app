@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getClinics, getExpenseEntries, setExpenseEntries, getExpenseHeads, getExpenseEntities } from '../../utils/localStorage.js';
+import { getClinics, getExpenseEntries, setExpenseEntries, getExpenseHeads } from '../../utils/localStorage.js';
 import { generateUniqueId } from '../../utils/auth.js';
 import { formatCurrency } from '../../utils/calculations.js';
-import { generateExpenseReport, generateExpenseSummaryReport, openReportWindow, downloadReportAsHTML } from '../../utils/expenseReportGenerator.js';
 import Button from '../../components/common/Button.jsx';
 import Input from '../../components/common/Input.jsx';
 import Select from '../../components/common/Select.jsx';
-import ReportHelp from '../../components/common/ReportHelp.jsx';
 import '../../styles/pages/expense-management.css';
 
 const ExpenseManagementPage = () => {
@@ -20,50 +18,74 @@ const ExpenseManagementPage = () => {
   // Calculator State
   const [inputs, setInputs] = useState({
     description: '',
-    entityId: '', // Changed from category to entityId
-    quantity: 1, // Added quantity for entity usage
+    headId: '',
     amount: '',
     expenseDate: new Date().toISOString().split('T')[0],
     notes: ''
   });
   const [calculations, setCalculations] = useState(null);
   
-  // Financial Settings from Clinic Configuration
-  const [gstPercent, setGstPercent] = useState(10);
-  
   // Expense Entries State
   const [expenseEntries, setExpenseEntriesState] = useState([]);
   
-  // Expense Heads and Entities State
+  // Expense Heads State
   const [expenseHeads, setExpenseHeads] = useState([]);
-  const [expenseEntities, setExpenseEntities] = useState([]);
-  const [selectedEntity, setSelectedEntity] = useState(null);
+  const [selectedHead, setSelectedHead] = useState(null);
 
-  // Calculate GST components - simplified to GST Inclusive only
+  // Calculate GST components based on head configuration
   const calculateExpenseGST = () => {
     const amount = parseFloat(inputs.amount) || 0;
-    const gstRate = gstPercent / 100;
     
-    // Always treat as GST Inclusive (amount includes GST)
-    const totalAmount = amount;
-    const gstAmount = amount / (1 + gstRate) * gstRate;
-    const netAmount = amount - gstAmount;
-    const gstCredit = gstAmount; // Can claim GST credit
+    if (!selectedHead || !selectedHead.gstApplicable) {
+      // GST-Free Head
+      return {
+        netAmount: amount,
+        gstAmount: 0,
+        totalAmount: amount,
+        gstCredit: 0,
+        // BAS Mapping for GST-Free expenses
+        basG11: amount,  // G11 - Total purchases (all expenses go here)
+        bas1B: 0        // 1B - No GST credits for GST-free
+      };
+    }
+
+    const gstRate = (selectedHead.gstPercentage || 10) / 100;
     
-    return {
-      netAmount,
-      gstAmount,
-      totalAmount,
-      gstCredit,
-      // BAS Codes for Australian Tax Office
-      basG10: totalAmount, // Total purchases
-      basG11: netAmount,   // GST-free purchases
-      bas1B: gstCredit     // GST credits claimed
-    };
+    if (selectedHead.gstType === 'exclusive') {
+      // Exclusive GST Head: Net = A, GST = A × R, Total = A + GST
+      const netAmount = amount;
+      const gstAmount = amount * gstRate;
+      const totalAmount = amount + gstAmount;
+      
+      return {
+        netAmount,
+        gstAmount,
+        totalAmount,
+        gstCredit: gstAmount,
+        // BAS Mapping for Exclusive GST expenses
+        basG11: totalAmount,  // G11 - Total purchases (full amount including GST)
+        bas1B: gstAmount     // 1B - GST credits claimed
+      };
+    } else {
+      // Inclusive GST Head: Net = A / (1 + R), GST = A - Net, Total = A
+      const totalAmount = amount;
+      const netAmount = amount / (1 + gstRate);
+      const gstAmount = amount - netAmount;
+      
+      return {
+        netAmount,
+        gstAmount,
+        totalAmount,
+        gstCredit: gstAmount,
+        // BAS Mapping for Inclusive GST expenses
+        basG11: totalAmount,  // G11 - Total purchases (full amount including GST)
+        bas1B: gstAmount     // 1B - GST credits claimed
+      };
+    }
   };
 
   const performCalculation = () => {
-    if (!inputs.amount || !inputs.entityId) {
+    if (!inputs.amount || !inputs.headId) {
       setCalculations(null);
       return;
     }
@@ -76,16 +98,14 @@ const ExpenseManagementPage = () => {
   const resetState = () => {
     setInputs({
       description: '',
-      entityId: '',
-      quantity: 1,
+      headId: '',
       amount: '',
       expenseDate: new Date().toISOString().split('T')[0],
       notes: ''
     });
     setCalculations(null);
-    setSelectedEntity(null);
+    setSelectedHead(null);
     setActiveTab('calculator');
-    setGstPercent(10); // Reset to default
   };
 
   useEffect(() => {
@@ -102,21 +122,13 @@ const ExpenseManagementPage = () => {
       const entries = getExpenseEntries().filter(entry => entry.clinicId === id);
       setExpenseEntriesState(entries);
       
-      // Load expense heads and entities for this clinic
+      // Load expense heads for this clinic
       const heads = getExpenseHeads().filter(head => head.clinicId === id);
-      const entities = getExpenseEntities().filter(entity => entity.clinicId === id);
       setExpenseHeads(heads);
-      setExpenseEntities(entities);
-      
-      // Set GST percentage from clinic settings
-      if (foundClinic.financialSettings?.commissionSplitting?.gstPercent) {
-        setGstPercent(foundClinic.financialSettings.commissionSplitting.gstPercent);
-      }
     } else {
       // Clear data if clinic not found
       setExpenseEntriesState([]);
       setExpenseHeads([]);
-      setExpenseEntities([]);
     }
     
     setIsLoading(false);
@@ -125,24 +137,17 @@ const ExpenseManagementPage = () => {
   // Real-time calculation when inputs change
   useEffect(() => {
     performCalculation();
-  }, [inputs.amount, gstPercent]);
+  }, [inputs.amount, inputs.headId]);
 
-  // Handle entity selection and auto-calculate amount
+  // Handle head selection
   useEffect(() => {
-    if (inputs.entityId && inputs.quantity) {
-      const entity = expenseEntities.find(e => e.id === inputs.entityId);
-      if (entity) {
-        setSelectedEntity(entity);
-        const calculatedAmount = entity.chargePerUse * inputs.quantity;
-        setInputs(prev => ({
-          ...prev,
-          amount: calculatedAmount.toString()
-        }));
-      }
+    if (inputs.headId) {
+      const head = expenseHeads.find(h => h.id === inputs.headId);
+      setSelectedHead(head);
     } else {
-      setSelectedEntity(null);
+      setSelectedHead(null);
     }
-  }, [inputs.entityId, inputs.quantity, expenseEntities]);
+  }, [inputs.headId, expenseHeads]);
 
   const handleInputChange = (field, value) => {
     setInputs(prev => ({
@@ -152,7 +157,7 @@ const ExpenseManagementPage = () => {
   };
 
   const handleSaveEntry = () => {
-    if (!calculations || !inputs.amount || !inputs.entityId || !inputs.description) return;
+    if (!calculations || !inputs.amount || !inputs.headId || !inputs.description) return;
     
     const allEntries = getExpenseEntries();
     const newEntry = {
@@ -160,13 +165,11 @@ const ExpenseManagementPage = () => {
       clinicId: id,
       entryDate: inputs.expenseDate,
       description: inputs.description,
-      entityId: inputs.entityId,
-      quantity: inputs.quantity,
+      headId: inputs.headId,
       notes: inputs.notes,
       inputs: { ...inputs },
       calculations: { ...calculations },
-      gstPercent,
-      selectedEntity: selectedEntity, // Store entity details for reporting
+      selectedHead: selectedHead, // Store head details for reporting
       createdAt: new Date().toISOString()
     };
     
@@ -177,14 +180,13 @@ const ExpenseManagementPage = () => {
     // Clear form
     setInputs({
       description: '',
-      entityId: '',
-      quantity: 1,
+      headId: '',
       amount: '',
       expenseDate: new Date().toISOString().split('T')[0],
       notes: ''
     });
     setCalculations(null);
-    setSelectedEntity(null);
+    setSelectedHead(null);
   };
 
   const handleDeleteEntry = (entryId) => {
@@ -196,59 +198,25 @@ const ExpenseManagementPage = () => {
     }
   };
 
-  const handleGenerateReport = (entry) => {
-    const reportHTML = generateExpenseReport(entry, clinic);
-    const reportTitle = `Expense Report - ${clinic.practiceName} - ${new Date(entry.entryDate).toLocaleDateString('en-AU')}`;
-    openReportWindow(reportHTML, reportTitle);
-  };
-
-  const handleDownloadReport = (entry) => {
-    const reportHTML = generateExpenseReport(entry, clinic);
-    const filename = `expense-report-${clinic.practiceName.replace(/\s+/g, '-')}-${entry.entryDate}.html`;
-    downloadReportAsHTML(reportHTML, filename);
-  };
-
-  const handleGenerateSummaryReport = () => {
-    const reportHTML = generateExpenseSummaryReport(expenseEntries, clinic);
-    const reportTitle = `Expense Summary Report - ${clinic.practiceName}`;
-    openReportWindow(reportHTML, reportTitle);
-  };
-
-  const handleDownloadSummaryReport = () => {
-    const reportHTML = generateExpenseSummaryReport(expenseEntries, clinic);
-    const filename = `expense-summary-${clinic.practiceName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.html`;
-    downloadReportAsHTML(reportHTML, filename);
-  };
-
   const renderInputFields = () => {
-    const getEntityName = (entityId) => {
-      const entity = expenseEntities.find(e => e.id === entityId);
-      return entity ? entity.name : 'Unknown Entity';
-    };
-
-    const getHeadName = (headId) => {
-      const head = expenseHeads.find(h => h.id === headId);
-      return head ? head.name : 'Unknown Head';
-    };
-
     return (
       <div className="input-fields">
         <h4>Expense Information</h4>
         
-        {expenseEntities.length === 0 && (
+        {expenseHeads.length === 0 && (
           <div className="alert alert-warning">
-            <h5>No Expense Entities Available</h5>
-            <p>Please create expense heads and entities before adding expense entries.</p>
+            <h5>No Expense Heads Available</h5>
+            <p>Please create expense heads before adding expense entries.</p>
             <Button
               variant="primary"
               onClick={() => navigate(`/clinics/${id}/expenses-head`)}
             >
-              Manage Expense Categories
+              Manage Expense Heads
             </Button>
           </div>
         )}
 
-        {expenseEntities.length > 0 && (
+        {expenseHeads.length > 0 && (
           <>
             <div className="form-row">
               <div className="form-group">
@@ -266,66 +234,56 @@ const ExpenseManagementPage = () => {
             <div className="form-row">
               <div className="form-group">
                 <Select
-                  label="Expense Entity *"
-                  value={inputs.entityId}
-                  onChange={(e) => handleInputChange('entityId', e.target.value)}
+                  label="Expense Head *"
+                  value={inputs.headId}
+                  onChange={(e) => handleInputChange('headId', e.target.value)}
                   options={[
-                    { value: '', label: 'Select Expense Entity' },
-                    ...expenseEntities.map(entity => {
-                      const head = expenseHeads.find(h => h.id === entity.headId);
-                      return {
-                        value: entity.id,
-                        label: `${entity.name} (${head?.name || 'Unknown Head'}) - $${entity.chargePerUse.toFixed(2)}/use`
-                      };
-                    })
+                    { value: '', label: 'Select Expense Head' },
+                    ...expenseHeads.map(head => ({
+                      value: head.id,
+                      label: `${head.name} ${head.gstApplicable ? `(GST ${head.gstType === 'exclusive' ? 'Exclusive' : 'Inclusive'} ${head.gstPercentage || 10}%)` : '(GST-Free)'}`
+                    }))
                   ]}
-                  help="Select the expense entity from your configured categories"
+                  help="Select the expense head with its GST configuration"
                 />
               </div>
             </div>
 
-            {selectedEntity && (
-              <div className="entity-info">
-                <h5>Selected Entity Details</h5>
-                <div className="entity-details">
-                  <div className="detail-item">
-                    <span className="detail-label">Entity:</span>
-                    <span className="detail-value">{selectedEntity.name}</span>
-                  </div>
+            {selectedHead && (
+              <div className="head-info">
+                <h5>Selected Head Details</h5>
+                <div className="head-details">
                   <div className="detail-item">
                     <span className="detail-label">Head:</span>
-                    <span className="detail-value">{getHeadName(selectedEntity.headId)}</span>
+                    <span className="detail-value">{selectedHead.name}</span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Type:</span>
-                    <span className="detail-value">{selectedEntity.type}</span>
+                    <span className="detail-label">Description:</span>
+                    <span className="detail-value">{selectedHead.description}</span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Purchase Price:</span>
-                    <span className="detail-value">${selectedEntity.purchasePrice.toFixed(2)}</span>
+                    <span className="detail-label">GST Applicable:</span>
+                    <span className={`detail-value ${selectedHead.gstApplicable ? 'success' : 'secondary'}`}>
+                      {selectedHead.gstApplicable ? 'Yes' : 'No'}
+                    </span>
                   </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Charge Per Use:</span>
-                    <span className="detail-value">${selectedEntity.chargePerUse.toFixed(2)}</span>
-                  </div>
+                  {selectedHead.gstApplicable && (
+                    <>
+                      <div className="detail-item">
+                        <span className="detail-label">GST Rate:</span>
+                        <span className="detail-value">{selectedHead.gstPercentage || 10}%</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="detail-label">GST Type:</span>
+                        <span className={`detail-value gst-type ${selectedHead.gstType || 'inclusive'}`}>
+                          {selectedHead.gstType === 'exclusive' ? 'Exclusive GST' : 'Inclusive GST'}
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             )}
-
-            <div className="form-row">
-              <div className="form-group">
-                <Input
-                  label="Quantity *"
-                  type="number"
-                  min="1"
-                  step="1"
-                  value={inputs.quantity}
-                  onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 1)}
-                  placeholder="1"
-                  help="Number of units/uses for this expense"
-                />
-              </div>
-            </div>
 
             <div className="form-row">
               <div className="form-group">
@@ -337,8 +295,10 @@ const ExpenseManagementPage = () => {
                   value={inputs.amount}
                   onChange={(e) => handleInputChange('amount', e.target.value)}
                   placeholder="0.00"
-                  help={selectedEntity ? `Auto-calculated: ${selectedEntity.chargePerUse.toFixed(2)} × ${inputs.quantity} = ${(selectedEntity.chargePerUse * inputs.quantity).toFixed(2)}` : "Enter the expense amount"}
-                  disabled={!!selectedEntity}
+                  help={selectedHead?.gstApplicable 
+                    ? `Enter amount ${selectedHead.gstType === 'exclusive' ? 'excluding' : 'including'} GST`
+                    : "Enter the expense amount (GST-free)"
+                  }
                 />
               </div>
             </div>
@@ -376,17 +336,21 @@ const ExpenseManagementPage = () => {
   const renderCalculationResults = () => {
     if (!calculations) return null;
 
+    const gstTypeLabel = selectedHead?.gstApplicable 
+      ? (selectedHead.gstType === 'exclusive' ? 'GST Exclusive' : 'GST Inclusive')
+      : 'GST-Free';
+
     return (
       <div className="calculation-results">
         <h3>Expense Calculation Results</h3>
         
         <div className="gst-breakdown">
-          <h5>GST Breakdown - GST Inclusive (Price includes GST)</h5>
+          <h5>GST Breakdown - {gstTypeLabel}</h5>
           <div className="breakdown-steps">
             <div className="step">Amount Entered: {formatCurrency(parseFloat(inputs.amount) || 0)}</div>
             <div className="step">Net Amount (Excl. GST): {formatCurrency(calculations.netAmount)}</div>
-            <div className="step">GST Amount ({gstPercent}%): {formatCurrency(calculations.gstAmount)}</div>
-            <div className="step">Total Amount (Incl. GST): {formatCurrency(calculations.totalAmount)}</div>
+            <div className="step">GST Amount ({selectedHead?.gstPercentage || 0}%): {formatCurrency(calculations.gstAmount)}</div>
+            <div className="step">Total Amount: {formatCurrency(calculations.totalAmount)}</div>
             <div className="step">GST Credit Available: {formatCurrency(calculations.gstCredit)}</div>
           </div>
         </div>
@@ -418,17 +382,17 @@ const ExpenseManagementPage = () => {
           <h4>BAS Codes (Business Activity Statement)</h4>
           <div className="bas-grid">
             <div className="bas-item">
-              <span className="bas-label">G10 - Total Purchases:</span>
-              <span className="bas-value">{formatCurrency(calculations.basG10 || 0)}</span>
-            </div>
-            <div className="bas-item">
-              <span className="bas-label">G11 - GST-free Purchases:</span>
+              <span className="bas-label">G11 - Total Purchases:</span>
               <span className="bas-value">{formatCurrency(calculations.basG11 || 0)}</span>
             </div>
             <div className="bas-item">
               <span className="bas-label">1B - GST Credits:</span>
               <span className="bas-value">{formatCurrency(calculations.bas1B || 0)}</span>
             </div>
+          </div>
+          <div className="bas-explanation">
+            <p><strong>G11</strong>: Total value of all purchases (including GST where applicable)</p>
+            <p><strong>1B</strong>: GST credits you can claim back from the ATO</p>
           </div>
         </div>
       </div>
@@ -446,9 +410,9 @@ const ExpenseManagementPage = () => {
   return (
     <div className="expense-management-page">
       <div className="page-header">
-        <h1>Australian Dental Clinic Expense Management</h1>
+        <h1>Head-Based Expense Management</h1>
         <p className="text-secondary">
-          Track and manage business expenses for {clinic.practiceName} with Australian GST compliance
+          Track and manage business expenses for {clinic.practiceName} with head-based GST configuration
         </p>
       </div>
 
@@ -481,21 +445,7 @@ const ExpenseManagementPage = () => {
         <div className="tab-content">
           <div className="form-card">
             <div className="form-card-header">
-              <h2 className="form-card-title">Australian Dental Clinic Expense Entry</h2>
-            </div>
-
-            <div className="gst-info">
-              <h3>GST Configuration</h3>
-              <div className="settings-summary">
-                <div className="setting-item">
-                  <span className="setting-label">GST Rate:</span>
-                  <span className="setting-value">{gstPercent}%</span>
-                </div>
-                <div className="setting-item">
-                  <span className="setting-label">BAS Compliance:</span>
-                  <span className="setting-value">Enabled</span>
-                </div>
-              </div>
+              <h2 className="form-card-title">Head-Based Expense Entry</h2>
             </div>
 
             {/* Input Fields */}
@@ -504,15 +454,15 @@ const ExpenseManagementPage = () => {
             {/* Calculation Results */}
             {renderCalculationResults()}
 
-            {/* Save Button - Always visible */}
+            {/* Save Button */}
             <div className="form-actions">
               {/* Validation Messages */}
-              {(!calculations || !inputs.amount || !inputs.entityId || !inputs.description) && (
+              {(!calculations || !inputs.amount || !inputs.headId || !inputs.description) && (
                 <div className="validation-messages">
                   <h4>Complete the following to save:</h4>
                   <ul>
                     {!inputs.description && <li>Enter a description</li>}
-                    {!inputs.entityId && <li>Select an expense entity</li>}
+                    {!inputs.headId && <li>Select an expense head</li>}
                     {!inputs.amount && <li>Enter an amount</li>}
                     {!calculations && <li>Calculation will appear when amount is entered</li>}
                   </ul>
@@ -523,38 +473,13 @@ const ExpenseManagementPage = () => {
                 <Button 
                   variant="primary" 
                   onClick={handleSaveEntry}
-                  disabled={!calculations || !inputs.amount || !inputs.entityId || !inputs.description}
+                  disabled={!calculations || !inputs.amount || !inputs.headId || !inputs.description}
                 >
-                  {(!calculations || !inputs.amount || !inputs.entityId || !inputs.description) 
+                  {(!calculations || !inputs.amount || !inputs.headId || !inputs.description) 
                     ? 'Complete Form to Save' 
                     : 'Save Expense Entry'
                   }
                 </Button>
-                
-                {calculations && inputs.amount && inputs.entityId && inputs.description && (
-                  <Button 
-                    variant="outline" 
-                    onClick={() => {
-                      const tempEntry = {
-                        id: 'preview-' + Date.now(),
-                        clinicId: id,
-                        entryDate: inputs.expenseDate,
-                        description: inputs.description,
-                        entityId: inputs.entityId,
-                        quantity: inputs.quantity,
-                        notes: inputs.notes,
-                        inputs: { ...inputs },
-                        calculations: { ...calculations },
-                        gstPercent,
-                        selectedEntity: selectedEntity,
-                        createdAt: new Date().toISOString()
-                      };
-                      handleGenerateReport(tempEntry);
-                    }}
-                  >
-                    Preview Report
-                  </Button>
-                )}
               </div>
             </div>
           </div>
@@ -568,22 +493,6 @@ const ExpenseManagementPage = () => {
             <div className="form-card-header">
               <h2 className="form-card-title">Expense Records</h2>
               <div className="header-actions">
-                {expenseEntries.length > 0 && (
-                  <>
-                    <Button
-                      variant="outline"
-                      onClick={handleGenerateSummaryReport}
-                    >
-                      View Summary Report
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={handleDownloadSummaryReport}
-                    >
-                      Download Summary
-                    </Button>
-                  </>
-                )}
                 <Button
                   variant="primary"
                   onClick={() => setActiveTab('calculator')}
@@ -592,9 +501,6 @@ const ExpenseManagementPage = () => {
                 </Button>
               </div>
             </div>
-
-            {/* Report Help */}
-            <ReportHelp />
 
             {/* Expense Entries List */}
             <div className="data-table">
@@ -606,9 +512,8 @@ const ExpenseManagementPage = () => {
                     <tr>
                       <th>Date</th>
                       <th>Description</th>
-                      <th>Entity</th>
                       <th>Head</th>
-                      <th>Quantity</th>
+                      <th>GST Type</th>
                       <th>Total Amount</th>
                       <th>GST Credit</th>
                       <th>Actions</th>
@@ -619,9 +524,16 @@ const ExpenseManagementPage = () => {
                       <tr key={entry.id}>
                         <td>{new Date(entry.entryDate).toLocaleDateString('en-AU')}</td>
                         <td>{entry.description}</td>
-                        <td>{entry.selectedEntity?.name || 'Unknown Entity'}</td>
-                        <td>{expenseHeads.find(h => h.id === entry.selectedEntity?.headId)?.name || 'Unknown Head'}</td>
-                        <td>{entry.quantity || 1}</td>
+                        <td>{entry.selectedHead?.name || 'Unknown Head'}</td>
+                        <td>
+                          {entry.selectedHead?.gstApplicable ? (
+                            <span className={`gst-type ${entry.selectedHead.gstType || 'inclusive'}`}>
+                              {entry.selectedHead.gstType === 'exclusive' ? 'Exclusive' : 'Inclusive'} ({entry.selectedHead.gstPercentage || 10}%)
+                            </span>
+                          ) : (
+                            <span className="gst-free">GST-Free</span>
+                          )}
+                        </td>
                         <td className="total-amount">
                           {formatCurrency(entry.calculations.totalAmount)}
                         </td>
@@ -630,22 +542,6 @@ const ExpenseManagementPage = () => {
                         </td>
                         <td>
                           <div className="action-buttons">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleGenerateReport(entry)}
-                              title="Generate Report"
-                            >
-                              📄 Report
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDownloadReport(entry)}
-                              title="Download Report"
-                            >
-                              💾 Download
-                            </Button>
                             <Button
                               variant="danger"
                               size="sm"

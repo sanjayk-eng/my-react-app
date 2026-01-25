@@ -11,6 +11,7 @@ import './styles/components/custom-financial-form.css';
 import './styles/components/clinic-user-form.css';
 import './styles/components/users-table.css';
 import './styles/components/toast.css';
+import './styles/components/expense-head.css';
 import './styles/components/loading.css';
 import './styles/components/bas-configuration.css';
 import './styles/CustomFormManager.css';
