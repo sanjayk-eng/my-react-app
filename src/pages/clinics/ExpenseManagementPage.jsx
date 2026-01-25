@@ -20,6 +20,7 @@ const ExpenseManagementPage = () => {
     description: '',
     headId: '',
     amount: '',
+    labFeeAmount: '',
     expenseDate: new Date().toISOString().split('T')[0],
     notes: ''
   });
@@ -35,59 +36,110 @@ const ExpenseManagementPage = () => {
   // Calculate GST components based on head configuration
   const calculateExpenseGST = () => {
     const amount = parseFloat(inputs.amount) || 0;
+    const labFeeAmount = parseFloat(inputs.labFeeAmount) || 0;
     
+    let mainExpenseCalc = {
+      netAmount: 0,
+      gstAmount: 0,
+      totalAmount: 0,
+      gstCredit: 0
+    };
+    
+    let labFeeCalc = {
+      netAmount: 0,
+      gstAmount: 0,
+      totalAmount: 0,
+      gstCredit: 0
+    };
+
+    // Calculate main expense
     if (!selectedHead || !selectedHead.gstApplicable) {
       // GST-Free Head
-      return {
+      mainExpenseCalc = {
         netAmount: amount,
         gstAmount: 0,
         totalAmount: amount,
-        gstCredit: 0,
-        // BAS Mapping for GST-Free expenses
-        basG11: amount,  // G11 - Total purchases (all expenses go here)
-        bas1B: 0        // 1B - No GST credits for GST-free
-      };
-    }
-
-    const gstRate = (selectedHead.gstPercentage || 10) / 100;
-    
-    if (selectedHead.gstType === 'exclusive') {
-      // Exclusive GST Head: Net = A, GST = A × R, Total = A + GST
-      const netAmount = amount;
-      const gstAmount = amount * gstRate;
-      const totalAmount = amount + gstAmount;
-      
-      return {
-        netAmount,
-        gstAmount,
-        totalAmount,
-        gstCredit: gstAmount,
-        // BAS Mapping for Exclusive GST expenses
-        basG11: totalAmount,  // G11 - Total purchases (full amount including GST)
-        bas1B: gstAmount     // 1B - GST credits claimed
+        gstCredit: 0
       };
     } else {
-      // Inclusive GST Head: Net = A / (1 + R), GST = A - Net, Total = A
-      const totalAmount = amount;
-      const netAmount = amount / (1 + gstRate);
-      const gstAmount = amount - netAmount;
+      const gstRate = 0.10; // Fixed 10% GST rate
       
-      return {
-        netAmount,
-        gstAmount,
-        totalAmount,
-        gstCredit: gstAmount,
-        // BAS Mapping for Inclusive GST expenses
-        basG11: totalAmount,  // G11 - Total purchases (full amount including GST)
-        bas1B: gstAmount     // 1B - GST credits claimed
-      };
+      if (selectedHead.gstType === 'exclusive') {
+        // Exclusive GST Head: Net = A, GST = A × R, Total = A + GST
+        const netAmount = amount;
+        const gstAmount = amount * gstRate;
+        const totalAmount = amount + gstAmount;
+        
+        mainExpenseCalc = {
+          netAmount,
+          gstAmount,
+          totalAmount,
+          gstCredit: gstAmount
+        };
+      } else {
+        // Inclusive GST Head: Net = A / (1 + R), GST = A - Net, Total = A
+        const totalAmount = amount;
+        const netAmount = amount / (1 + gstRate);
+        const gstAmount = amount - netAmount;
+        
+        mainExpenseCalc = {
+          netAmount,
+          gstAmount,
+          totalAmount,
+          gstCredit: gstAmount
+        };
+      }
     }
+
+    // Calculate lab fee if applicable
+    if (selectedHead?.labFeeApplicable && labFeeAmount > 0) {
+      if (selectedHead.gstOnLabFee) {
+        // Lab fee with GST (always inclusive)
+        const gstRate = 0.10;
+        const totalLabFee = labFeeAmount;
+        const netLabFee = labFeeAmount / (1 + gstRate);
+        const gstLabFee = labFeeAmount - netLabFee;
+        
+        labFeeCalc = {
+          netAmount: netLabFee,
+          gstAmount: gstLabFee,
+          totalAmount: totalLabFee,
+          gstCredit: gstLabFee
+        };
+      } else {
+        // Lab fee without GST
+        labFeeCalc = {
+          netAmount: labFeeAmount,
+          gstAmount: 0,
+          totalAmount: labFeeAmount,
+          gstCredit: 0
+        };
+      }
+    }
+
+    // Combine calculations
+    return {
+      mainExpense: mainExpenseCalc,
+      labFee: labFeeCalc,
+      netAmount: mainExpenseCalc.netAmount + labFeeCalc.netAmount,
+      gstAmount: mainExpenseCalc.gstAmount + labFeeCalc.gstAmount,
+      totalAmount: mainExpenseCalc.totalAmount + labFeeCalc.totalAmount,
+      gstCredit: mainExpenseCalc.gstCredit + labFeeCalc.gstCredit,
+      basG10: mainExpenseCalc.totalAmount + labFeeCalc.totalAmount,
+      basG11: mainExpenseCalc.netAmount + labFeeCalc.netAmount,
+      bas1B: mainExpenseCalc.gstCredit + labFeeCalc.gstCredit
+    };
   };
 
   const performCalculation = () => {
     if (!inputs.amount || !inputs.headId) {
       setCalculations(null);
       return;
+    }
+    
+    // If lab fee is applicable but no lab fee amount is entered, still calculate main expense
+    if (selectedHead?.labFeeApplicable && !inputs.labFeeAmount) {
+      // Allow calculation with just main expense amount
     }
     
     const result = calculateExpenseGST();
@@ -100,6 +152,7 @@ const ExpenseManagementPage = () => {
       description: '',
       headId: '',
       amount: '',
+      labFeeAmount: '',
       expenseDate: new Date().toISOString().split('T')[0],
       notes: ''
     });
@@ -137,7 +190,7 @@ const ExpenseManagementPage = () => {
   // Real-time calculation when inputs change
   useEffect(() => {
     performCalculation();
-  }, [inputs.amount, inputs.headId]);
+  }, [inputs.amount, inputs.labFeeAmount, inputs.headId]);
 
   // Handle head selection
   useEffect(() => {
@@ -182,6 +235,7 @@ const ExpenseManagementPage = () => {
       description: '',
       headId: '',
       amount: '',
+      labFeeAmount: '',
       expenseDate: new Date().toISOString().split('T')[0],
       notes: ''
     });
@@ -241,7 +295,7 @@ const ExpenseManagementPage = () => {
                     { value: '', label: 'Select Expense Head' },
                     ...expenseHeads.map(head => ({
                       value: head.id,
-                      label: `${head.name} ${head.gstApplicable ? `(GST ${head.gstType === 'exclusive' ? 'Exclusive' : 'Inclusive'} ${head.gstPercentage || 10}%)` : '(GST-Free)'}`
+                      label: `${head.name} ${head.gstApplicable ? `(GST ${head.gstType === 'exclusive' ? 'Exclusive' : 'Inclusive'})` : '(GST-Free)'}`
                     }))
                   ]}
                   help="Select the expense head with its GST configuration"
@@ -271,12 +325,30 @@ const ExpenseManagementPage = () => {
                     <>
                       <div className="detail-item">
                         <span className="detail-label">GST Rate:</span>
-                        <span className="detail-value">{selectedHead.gstPercentage || 10}%</span>
+                        <span className="detail-value">10%</span>
                       </div>
                       <div className="detail-item">
                         <span className="detail-label">GST Type:</span>
                         <span className={`detail-value gst-type ${selectedHead.gstType || 'inclusive'}`}>
                           {selectedHead.gstType === 'exclusive' ? 'Exclusive GST' : 'Inclusive GST'}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                  {selectedHead.labFeeApplicable && (
+                    <>
+                      <div className="detail-item">
+                        <span className="detail-label">Lab Fee:</span>
+                        <span className="detail-value success">Applicable</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="detail-label">Lab Fee Paid By:</span>
+                        <span className="detail-value">{selectedHead.labFeePaidBy === 'dentist' ? 'Dentist' : 'Clinic'}</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="detail-label">GST on Lab Fee:</span>
+                        <span className={`detail-value ${selectedHead.gstOnLabFee ? 'success' : 'secondary'}`}>
+                          {selectedHead.gstOnLabFee ? 'Yes' : 'No'}
                         </span>
                       </div>
                     </>
@@ -302,6 +374,23 @@ const ExpenseManagementPage = () => {
                 />
               </div>
             </div>
+
+            {selectedHead?.labFeeApplicable && (
+              <div className="form-row">
+                <div className="form-group">
+                  <Input
+                    label={`Lab Fee Amount ${selectedHead.gstOnLabFee ? '(including GST)' : '(GST-free)'}`}
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={inputs.labFeeAmount}
+                    onChange={(e) => handleInputChange('labFeeAmount', e.target.value)}
+                    placeholder="0.00"
+                    help={`Lab fee paid by ${selectedHead.labFeePaidBy === 'dentist' ? 'dentist' : 'clinic'}${selectedHead.gstOnLabFee ? ' (GST will be calculated automatically)' : ''}`}
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="form-row">
               <div className="form-group">
@@ -349,7 +438,7 @@ const ExpenseManagementPage = () => {
           <div className="breakdown-steps">
             <div className="step">Amount Entered: {formatCurrency(parseFloat(inputs.amount) || 0)}</div>
             <div className="step">Net Amount (Excl. GST): {formatCurrency(calculations.netAmount)}</div>
-            <div className="step">GST Amount ({selectedHead?.gstPercentage || 0}%): {formatCurrency(calculations.gstAmount)}</div>
+            <div className="step">GST Amount: {formatCurrency(calculations.gstAmount)}</div>
             <div className="step">Total Amount: {formatCurrency(calculations.totalAmount)}</div>
             <div className="step">GST Credit Available: {formatCurrency(calculations.gstCredit)}</div>
           </div>
